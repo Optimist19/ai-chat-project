@@ -17,18 +17,15 @@
       <div class="para">
         <p>Ask me anything!!!</p>
       </div>
+      <!-- <div class="user-input">
+        <p>Ask me anything!!!</p>
+      </div> -->
+      <!-- <div class="response">
+        <p>Ask me anything!!!</p>
+      </div>
       <div class="user-input">
         <p>Ask me anything!!!</p>
-      </div>
-      <div class="para">
-        <p>Ask me anything!!!</p>
-      </div>
-      <div class="user-input">
-        <p>Ask me anything!!!</p>
-      </div>
-      <div>
-        {{ assistant }}
-      </div>
+      </div> -->
     </div>
     
     <div>
@@ -49,7 +46,7 @@ export default {
   name: 'HelloWorld',
   setup(){
     const input = ref("")
-    const assistant = ref("")
+    
 
    let message = reactive([
           {
@@ -62,7 +59,8 @@ export default {
     console.log(message, "up")
     
     const configuration = new Configuration({
-        apiKey: "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"
+      // Get your OpenAi api key and set it as a value to the apiKey(key)
+        apiKey: "OpenAi_api-key"
     });
     const openai = new OpenAIApi(configuration);
     console.log(openai)
@@ -76,10 +74,11 @@ export default {
       })
       let child = document.createElement("div")
       let parent = document.getElementById("chat-con")
-      child.classList.add("user-input")
-      child.innerText = input.value
       parent.appendChild(child)
       openAi()
+      console.log(document.querySelector(".user-input"))
+      child.innerText = input.value
+      child.setAttribute("class", "user-input")
     }
 
     const openAi = async () =>{
@@ -92,14 +91,17 @@ export default {
 
       let child = document.createElement("div")
       let parent = document.getElementById("chat-con")
-      child.classList.add("response")
       child.innerText = response.data.choices[0].message.content
+      console.log(child)
       parent.appendChild(child)
+      child.setAttribute("class","response")
       
       message.push(response.data.choices[0].message)
       console.log(response)
 
     }
+
+
 
     
 
@@ -107,7 +109,6 @@ export default {
     return{
       input,
       btn,
-      assistant,
       message
     }
   }
@@ -172,7 +173,7 @@ img{
   float: left;
 }
 
-.user-input{
+ .user-input{
   background-color: rgb(34, 41, 35);
   border-bottom-left-radius: 10px;
   border-top-left-radius: 10px;
