@@ -1,58 +1,229 @@
 <template>
   <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+
+    <div class="img-div">
+      <img alt="Vue logo" src="../assets/logo.png" />
+      <p class="plus">+</p>
+      
+
+      
+      <div>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/ChatGPT_logo.svg/1024px-ChatGPT_logo.svg.png" class="logo" alt="">
+      </div>
+    </div>
+
+    <div id="chat-con">
+
+      <div class="para">
+        <p>Ask me anything!!!</p>
+      </div>
+      <div class="user-input">
+        <p>Ask me anything!!!</p>
+      </div>
+      <div class="para">
+        <p>Ask me anything!!!</p>
+      </div>
+      <div class="user-input">
+        <p>Ask me anything!!!</p>
+      </div>
+      <div>
+        {{ assistant }}
+      </div>
+    </div>
+    
+    <div>
+      <!-- {{ message[1].content }} -->
+    </div>
+    <div class="t-b">
+      <textarea name="" id="" cols="65" rows="5" v-model="input"></textarea>
+      <button @click="btn"><i class="fa-brands fa-telegram"></i></button>
+    </div>
   </div>
 </template>
 
 <script>
+import {ref, reactive} from "vue"
+import { Configuration, OpenAIApi } from "openai";
+
 export default {
   name: 'HelloWorld',
-  props: {
-    msg: String
+  setup(){
+    const input = ref("")
+    const assistant = ref("")
+
+   let message = reactive([
+          {
+            "role": "system",
+            "content":   "You are a highly knowledgeable assistant that is always happy to help."
+          }
+        ]
+      )
+
+    console.log(message, "up")
+    
+    const configuration = new Configuration({
+        apiKey: "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"
+    });
+    const openai = new OpenAIApi(configuration);
+    console.log(openai)
+
+    const btn =  (e) =>{
+      e.preventDefault();
+      
+      message.push({
+        "role": "user",
+        "content": input.value
+      })
+      let child = document.createElement("div")
+      let parent = document.getElementById("chat-con")
+      child.classList.add("user-input")
+      child.innerText = input.value
+      parent.appendChild(child)
+      openAi()
+    }
+
+    const openAi = async () =>{
+    
+      const response = await openai.createChatCompletion({
+        model: "gpt-3.5-turbo",
+        messages: message
+      });
+   
+
+      let child = document.createElement("div")
+      let parent = document.getElementById("chat-con")
+      child.classList.add("response")
+      child.innerText = response.data.choices[0].message.content
+      parent.appendChild(child)
+      
+      message.push(response.data.choices[0].message)
+      console.log(response)
+
+    }
+
+    
+
+    console.log(message, "down")
+    return{
+      input,
+      btn,
+      assistant,
+      message
+    }
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
+
+.hello{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20vh;
+  margin-bottom: 20vh;
+  margin-right: auto;
+  margin-left: auto;
+  max-width: 40vw; 
+  background-color: rgb(195, 219, 164);
 }
-ul {
-  list-style-type: none;
-  padding: 0;
+
+
+
+
+.img-div{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2vh 2vw;
+  border-bottom: 4px solid rgb(107, 255, 174);
+  margin-bottom: 2vh;
 }
-li {
-  display: inline-block;
-  margin: 0 10px;
+
+.plus{
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0 2vw;
 }
-a {
-  color: #42b983;
+
+img{
+  max-width: 10vw;
+}
+
+.logo{
+  border-radius: 50%;
+  animation: rotate 2s linear infinite;
+  margin-bottom: 2vh;
+}
+
+#chat-con{
+  margin: 0 1vw;
+}
+
+.para{
+  background-color: rgb(91, 109, 94);
+  border-top-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  padding: 0.1vh 2vw;
+  width: 20vw;
+  float: left;
+}
+
+.user-input{
+  background-color: rgb(34, 41, 35);
+  border-bottom-left-radius: 10px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  padding: 0.1vh 2vw;
+  margin: 2vh 0;
+  width: 20vw;
+  float: right;
+}
+.response{
+  background-color: rgb(91, 109, 94);
+  border-bottom-left-radius: 10px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  padding: 0.1vh 2vw;
+  margin: 2vh 0;
+}
+
+
+.t-b{
+  display: flex;
+  align-items: center;
+  max-width: 40vw;
+  background-color: rgb(71, 69, 69);
+}
+
+textarea{
+  /* border-radius: 7px; */
+  border-right: none;
+  border-top-left-radius: 7px;
+  border-bottom-left-radius: 7px;
+  background-color: rgb(71, 69, 69);
+}
+
+button{
+  padding: 0.5vh 1vw;
+  border-top-right-radius: 7px;
+  border-bottom-right-radius: 7px;
+  border: none;
+}
+
+i{
+  font-size: 20px;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>
